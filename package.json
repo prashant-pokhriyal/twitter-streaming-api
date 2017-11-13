@@ -1,0 +1,19 @@
+{
+  "name": "pothi_programming_task",
+  "version": "1.0.0",
+  "description": "Use the Twitter Streaming API to track a given keyword and generate various reports about the tweets",
+  "main": "index.js",
+  "repository": "https://github.com/prashant-pokhriyal/pothi_programing_task.git",
+  "author": "Prashant Pokhriyal",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "chalk": "^2.3.0",
+    "clear": "^0.0.1",
+    "clui": "^0.3.6",
+    "figlet": "^1.2.0",
+    "inquirer": "^4.0.0",
+    "preferences": "^1.0.0",
+    "twitter": "^1.7.1"
+  }
+}
