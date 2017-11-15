@@ -50,8 +50,10 @@ var
     */
     keyword_extractor = require("keyword-extractor"),
 
+    fs      = require('fs'),
     Spinner = CLI.Spinner,
     prefs   = new Preferences('pothi'),
+    credFileName = 'cred.json',
     print   = console.log;
 
 const util = require('util');
@@ -99,6 +101,14 @@ function twitterAuth(callback) {
   it will ask from user, otherwise return the stored value.
 */
 function getTwitterAccess(callback) {
+
+  var cred = JSON.parse(fs.readFileSync(credFileName, 'utf8'));
+  if((cred.consumer_key != undefined && cred.consumer_key != '') &&
+     (cred.consumer_secret != undefined && cred.consumer_secret != '') &&
+     (cred.access_token_key != undefined && cred.access_token_key != '') &&
+     (cred.access_token_secret != undefined && cred.access_token_secret != '')) {
+       return callback(cred);
+     }
 
   var questions = [
     {
