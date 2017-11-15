@@ -14,6 +14,7 @@
     "clui": "^0.3.6",
     "figlet": "^1.2.0",
     "inquirer": "^4.0.0",
+    "keyword-extractor": "^0.0.14",
     "moment": "^2.19.2",
     "preferences": "^1.0.0",
     "twitter": "^1.7.1"
