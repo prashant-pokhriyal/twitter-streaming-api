@@ -1,3 +1,11 @@
+/**
+* @version 1.0.0
+* @file  Tracking a given keyword and generate various reports about the tweets.
+* @author Prashant Pokhriyal <pokhariyalp@gmail.com>
+*
+*/
+
+
 var
     /*
       Terminal string styling
