@@ -9,8 +9,8 @@ Using the [Twitter Streaming API](https://developer.twitter.com/en/docs/tweets/f
 **Yet to be drafted**
 
 ## Prerequisites
-- [nodejs](https://nodejs.org/en/download/)
-- [yarn](https://yarnpkg.com/lang/en/docs/install/)
+- [nodejs v8.9.1](https://nodejs.org/en/download/)
+- [yarn v1.3.2](https://yarnpkg.com/lang/en/docs/install/)
 
 You need valid Twitter developer credentials in the form of a set of consumer and access tokens/keys. You can get these [here](https://apps.twitter.com/).
   ```
