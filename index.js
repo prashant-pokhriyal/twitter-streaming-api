@@ -195,8 +195,8 @@ function askKeyword(callback) {
 */
 function searchKeyword(client,keyword) {
 
-  var users_twitted = {}, links = {}, total_links = 0, unique_words = 0,
-  start_time = moment(), minutes_counter = 1, words = {},
+  var users_twitted = {}, links = {}, start_time = moment(),
+  minutes_counter = 1, words = {}, dataset = [],
   countdown = new Spinner('Result will display in 60 seconds...');
 
   countdown.start();
@@ -204,58 +204,23 @@ function searchKeyword(client,keyword) {
   client.stream('statuses/filter', {track: keyword},  function(stream) {
     stream.on('data', function(tweet) {
       // print(util.inspect(tweet, false, null));
+      if(tweet.lang != 'en')
+        return;
       var now = moment(),
       timer = 60 * minutes_counter - now.diff(start_time,"seconds");
       countdown.message('Results will display in ' + timer + ' seconds...');
       var minutes_ago = now.diff(start_time,"minutes");
 
-      if(minutes_ago > 5) {
-        countdown.stop();
-        process.exit();
-      }
-
-      if(tweet.lang != 'en')
-        return;
-
       if(minutes_ago == minutes_counter) {
         countdown.stop();
-        var userTable = new Table({
-          head : ['User', 'Counts', 'Total Tweets'],
-          // colWidths : [40]
-        }),
-
-        linkTable = new Table({
-          head : ['Links', 'Count']
-        }),
-
-        wordTable = new Table({
-          head : ['Words', 'Count']
-        });
-
-        for(var user in users_twitted) {
-          if(!users_twitted.hasOwnProperty(user))
-            continue;
-          userTable.push([user, users_twitted[user].count, users_twitted[user].statuses]);
-        }
-
-        for(var link in links) {
-          if(!users_twitted.hasOwnProperty(user)) continue;
-          linkTable.push([link, links[link].count]);
-        }
-
-        var keysSorted = Object.keys(words).sort(function(a,b){return words[b] - words[a]});
-
-        for(var i = 0 ; i < 10; i++) {
-          wordTable.push([keysSorted[i], words[keysSorted[i]]]);
-        }
-
-        print("**************************************************************");
-        print("             Report After "+ minutes_counter + " minute");
-        print("**************************************************************");
-        print();
-        display('Users', userTable);
-        display('Links', linkTable, 'links:' + total_links);
-        display('Content', wordTable, 'unique words:' + unique_words);
+        dataset[(minutes_counter - 1) % 5 + 1] = {
+          users_twitted : users_twitted,
+          links         : links,
+          words         : words,
+        };
+        create_and_print_result(dataset, minutes_counter);
+        users_twitted = {}, links = {},words = {},
+        total_links = 0, unique_words = 0;
         countdown.start();
         ++minutes_counter;
       }
@@ -277,7 +242,6 @@ function searchKeyword(client,keyword) {
         }
         ++links[tweet.entities.urls[i].expanded_url].count;
       }
-      total_links += tweet.entities.urls.length;
 
       // stopword.removeStopwords(tweet.text.split(' '))
       // wordpos.parse(tweet.text)
@@ -289,7 +253,6 @@ function searchKeyword(client,keyword) {
       })
       .forEach(function(word) {
         if(words[word] === undefined) {
-          ++unique_words;
           words[word] = 0;
         }
         ++words[word];
@@ -297,6 +260,84 @@ function searchKeyword(client,keyword) {
     });
 
   });
+}
+
+function create_and_print_result(dataset, minutes_counter) {
+
+  var userTable = new Table({
+    head : ['User', 'Counts', 'Total Tweets'],
+    // colWidths : [40]
+  }),
+
+  linkTable = new Table({
+    head : ['Links', 'Count']
+  }),
+
+  wordTable = new Table({
+    head : ['Words', 'Count']
+  }),
+  users_twitted = {},
+  links = {}, total_links = 0,
+  words = {}, unique_words = 0;
+
+  dataset.forEach(function(data) {
+    print(data);
+    if(data == undefined)
+      return;
+    Object.keys(data.users_twitted).forEach(function(user) {
+      if(users_twitted[user] === undefined) {
+        users_twitted[user] = data.users_twitted[user];
+      }
+      users_twitted[user].count += data.users_twitted[user].count;
+    });
+
+    Object.keys(data.links).forEach(function(link) {
+      if(links[link] == undefined) {
+        links[link] = data.links[link];
+      }
+      links[link].count += data.links[link].count;
+      total_links += links[link].count;
+    });
+
+    Object.keys(data.words).forEach(function(word) {
+      if(words[word] === undefined) {
+        words[word] = data.words[word];
+        ++unique_words;
+      }
+      words[word] += data.words[word];
+    });
+
+  });
+
+  for(var user in users_twitted) {
+    if(!users_twitted.hasOwnProperty(user))
+      continue;
+    userTable.push([user, users_twitted[user].count, users_twitted[user].statuses]);
+  }
+
+  for(var link in links) {
+    if(!users_twitted.hasOwnProperty(user)) continue;
+    linkTable.push([link, links[link].count]);
+  }
+
+  var keysSorted = Object.keys(words).sort(function(a,b){return words[b] - words[a]});
+
+  for(var i = 0 ; i < 10 && i < keysSorted.length; i++) {
+    wordTable.push([keysSorted[i], words[keysSorted[i]]]);
+  }
+
+  print("**************************************************************");
+  if(minutes_counter > 5) {
+    print("             Report of last 5 minutes");
+  }
+  else {
+    print("             Report After "+ minutes_counter + " minute");
+  }
+  print("**************************************************************");
+  print();
+  display('Users', userTable);
+  display('Links', linkTable, 'links:' + total_links);
+  display('Content', wordTable, 'unique words:' + unique_words);
 }
 
 /*
