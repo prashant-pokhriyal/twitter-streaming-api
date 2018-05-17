@@ -1,6 +1,6 @@
-# Pothi Twitter Streaming API Task
+# Twitter Streaming API
 
-![Pothi Programming Task](https://assets.pothi.com/img/logo.png)
+![Twitter Streaming API](https://marketing.twitter.com/content/dam/marketing-twitter/brand/logo.png)
 
 Using the [Twitter Streaming API](https://developer.twitter.com/en/docs/tweets/filter-realtime/overview) to track a given keyword and generate various reports about the tweets.
 
